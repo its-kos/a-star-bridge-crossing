@@ -1,13 +1,17 @@
 package com.aueb.assignment;
 
-import java.util.ArrayList;
-
 public class Heuristic {
 
     private int heuristicNum;
 
     public Heuristic(int heuristicNum){
         this.heuristicNum = heuristicNum;
+    }
+    public Heuristic(){};
+
+    public int dimar_calculate(State state){
+        int rightSideMembers = state.getRightSide().length;
+        return !state.getisTorchLeft()?rightSideMembers-1 :rightSideMembers+1;
     }
 
     public int calculate(State child){

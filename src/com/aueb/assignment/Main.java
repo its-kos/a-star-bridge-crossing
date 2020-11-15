@@ -5,6 +5,7 @@ public class Main {
 
         State initialState = new State(4);
         initialState.print();
+        System.out.println("End of Initial State Printing");
         SpaceSearcher spaceSearcher = new SpaceSearcher();
         State terminalState = null;
 

@@ -1,5 +1,4 @@
 package com.aueb.assignment;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,6 +14,7 @@ public class SpaceSearcher {
     }
 
     public State aStar(State initialState, int heuristicNum) {
+        System.out.println("A* Start");
         this.states = new ArrayList<>();
         this.states.add(initialState);
         while(this.states.size() > 0) {
@@ -22,8 +22,17 @@ public class SpaceSearcher {
             if(currentState.isTerminal()) {
                 return currentState;
             }
+            
             this.states.addAll(currentState.getChildren(heuristicNum));
-            Collections.sort(this.states);
+            if(!this.states.isEmpty()){
+            int min= this.states.get(0).GH_sum();
+            for(State state: this.states){
+                if(state.GH_sum()<min){ min=state.GH_sum(); }
+            }
+            //Minimum Cost Found
+            
+        }
+           // Collections.sort(this.states);
         }
         return null;
     }
@@ -41,7 +50,7 @@ public class SpaceSearcher {
                 this.closedSet.add(currentState);
                 this.states.addAll(currentState.getChildren(heuristicNum));
             }
-            Collections.sort(this.states);
+           // Collections.sort(this.states);
         }
         return null;
     }

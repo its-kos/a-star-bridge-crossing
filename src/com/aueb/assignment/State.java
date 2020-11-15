@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class State {
-
+    
     private int membersNum;
     private int hScore;
     private int gCost;
@@ -12,7 +12,7 @@ public class State {
     private int [] memberSpeeds;
     private int [] leftSide;
     private int [] rightSide;
-    private boolean torchState = false; //False if the torch is on the right side, true if its on the left side.
+    private boolean isTorchLeft= false; //False if the torch is on the right side, true if its on the left side.
     private Heuristic heuristic;
 
     public State() {}
@@ -23,7 +23,7 @@ public class State {
      */
     public State(int membersNum) {
         this.membersNum = membersNum;
-        this.torchState = false;
+        this.isTorchLeft = false;
         this.memberSpeeds = new int[this.membersNum];
         this.rightSide = new int[this.membersNum];
         this.leftSide = new int[this.membersNum];
@@ -36,10 +36,10 @@ public class State {
     /***
      * For copying states (Used in the getChildren method to make state copies).
      */
-    public State(int[]leftSide, int[]rightSide, boolean torchState, int gCost) {
+    public State(int[]leftSide, int[]rightSide, boolean isTorchLeft, int gCost) {
         this.membersNum = leftSide.length;
-        this.torchState = torchState;
-        int gCost = gCost +
+        this.isTorchLeft = isTorchLeft;
+        this.gCost = gCost;
         this.hScore = -1;
         this.rightSide = new int[leftSide.length];
         this.leftSide = new int[leftSide.length];
@@ -57,6 +57,7 @@ public class State {
     public int getH() { return hScore; }
 
     public int getG() { return gCost; }
+    public int GH_sum() { return gCost+hScore; }
 
     public State getFather(){ return father; }
 
@@ -66,7 +67,7 @@ public class State {
 
     public int[] getMemberSpeeds() { return memberSpeeds; }
 
-    public boolean getTorchState(){ return torchState; }
+    public boolean getisTorchLeft(){ return isTorchLeft; }
 
     public void setMembersNum(int membersNum) { this.membersNum = membersNum; }
 
@@ -82,22 +83,32 @@ public class State {
 
     public void setMemberSpeeds(int[] memberSpeeds) { this.memberSpeeds = memberSpeeds; }
 
-    public void setTorchState(boolean state){ torchState = state; }
+    public void setisTorchLeft(boolean state){ isTorchLeft = state; }
 
     /***Methods to move family members across the river*/
     public boolean moveLeft(int firstMember, int secondMember) {
+        if(firstMember < 0||secondMember<0) {return false;}
+        //checks if one of the members are on left Side.
+        if(leftSide[firstMember]==firstMember|| leftSide[secondMember]==secondMember){
+            return false;
+        }
         leftSide[firstMember] = firstMember;
         leftSide[secondMember] = secondMember;
         rightSide[firstMember] = 0;
         rightSide[secondMember] = 0;
-        torchState = true;
+        isTorchLeft = true;
         return true;
     }
 
     public boolean moveRight(int memberIndex) {
+        if(memberIndex<0) {return false;}
+        //checks if member is on the right side
+        if(rightSide[memberIndex]==memberIndex){
+            return false;
+        }
         leftSide[memberIndex] = 0;
         rightSide[memberIndex] = memberIndex;
-        torchState = false;
+        isTorchLeft = false;
         return true;
     }
 
@@ -113,7 +124,7 @@ public class State {
         State child;
 
         //If torch is on the right side we move 2 people left
-        if(!torchState) {
+        if(!isTorchLeft) {
 
             list.clear();
             for (int element : rightSide) {
@@ -122,9 +133,9 @@ public class State {
             while (!list.isEmpty()) {
                 int currentPerson = list.remove(0);
                 for (int element : list) {
-                    child = new State(leftSide, rightSide, torchState);
-                    if (child.moveLeft(currentPerson, element)) {
-                        this.hScore = heuristic.calculate(child);
+                    child = new State(leftSide, rightSide, isTorchLeft,0);
+                    if (child.moveLeft(currentPerson, element-1)) {
+                        this.hScore = heuristic.dimar_calculate(child);
                         child.setFather(this);
                         children.add(child);
                     }
@@ -133,9 +144,9 @@ public class State {
         //If torch is on the left side we move 1 person right
         }else {
             for (int elem : leftSide) {
-                child = new State(leftSide, rightSide, torchState);
+                child = new State(leftSide, rightSide, isTorchLeft,0);
                 if (child.moveRight(elem)) {
-                    child.hScore = heuristic.calculate(child);
+                    child.hScore = heuristic.dimar_calculate(child);
                     child.setFather(this);
                     children.add(child);
                 }
