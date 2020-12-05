@@ -10,8 +10,8 @@ public class Heuristic {
     public Heuristic(){};
 
     public int dimar_calculate(State state){
-        int rightSideMembers = state.getRightSide().length;
-        return !state.getisTorchLeft()?rightSideMembers-1 :rightSideMembers+1;
+        return state.getRightSide().length;
+        //return !state.getisTorchLeft()? rightSideMembers - 1 : rightSideMembers + 1;
     }
 
     public int calculate(State child){

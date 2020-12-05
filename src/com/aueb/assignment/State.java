@@ -21,15 +21,16 @@ public class State {
      * For initialization of the problem
      * @param membersNum : The number of the family members
      */
-    public State(int membersNum) {
+    public State(int membersNum, int[]leftSide, int[]rightSide) {
         this.membersNum = membersNum;
         this.isTorchLeft = false;
         this.memberSpeeds = new int[this.membersNum];
         this.rightSide = new int[this.membersNum];
         this.leftSide = new int[this.membersNum];
-        for(int i = 0; i < membersNum; i++){
+        /*for(int i = 0; i < membersNum; i++){
             this.rightSide[i] = i + 1;
-        }
+        }*/
+        Arrays.fill(this.rightSide, 1);
         Arrays.fill(this.leftSide, 0);
     }
 
@@ -87,13 +88,10 @@ public class State {
 
     /***Methods to move family members across the river*/
     public boolean moveLeft(int firstMember, int secondMember) {
-        if(firstMember < 0||secondMember<0) {return false;}
-        //checks if one of the members are on left Side.
-        if(leftSide[firstMember]==firstMember|| leftSide[secondMember]==secondMember){
-            return false;
-        }
-        leftSide[firstMember] = firstMember;
-        leftSide[secondMember] = secondMember;
+        if(firstMember < 0) {return false;}
+        if(secondMember < 0) {return false;}
+        leftSide[firstMember] = 1;
+        leftSide[secondMember] = 1;
         rightSide[firstMember] = 0;
         rightSide[secondMember] = 0;
         isTorchLeft = true;
@@ -102,12 +100,8 @@ public class State {
 
     public boolean moveRight(int memberIndex) {
         if(memberIndex<0) {return false;}
-        //checks if member is on the right side
-        if(rightSide[memberIndex]==memberIndex){
-            return false;
-        }
         leftSide[memberIndex] = 0;
-        rightSide[memberIndex] = memberIndex;
+        rightSide[memberIndex] = 1;
         isTorchLeft = false;
         return true;
     }
@@ -119,7 +113,7 @@ public class State {
      */
     public ArrayList<State> getChildren(int heuristicNum) {
         ArrayList<State> children = new ArrayList<State>();
-        ArrayList<Integer> list = new ArrayList<>();
+        ArrayList<Integer> indexes = new ArrayList<>();
         heuristic = new Heuristic(heuristicNum);
         State child;
 
@@ -127,9 +121,7 @@ public class State {
         if(!isTorchLeft) {
 
             list.clear();
-            for (int element : rightSide) {
-                list.add(element);
-            }
+            while (!rightSide.indexOf)
             while (!list.isEmpty()) {
                 int currentPerson = list.remove(0);
                 for (int element : list) {

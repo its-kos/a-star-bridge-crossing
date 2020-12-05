@@ -19,10 +19,10 @@ public class SpaceSearcher {
         this.states.add(initialState);
         while(this.states.size() > 0) {
             State currentState = this.states.remove(0);
+            currentState.print();
             if(currentState.isTerminal()) {
                 return currentState;
             }
-            
             this.states.addAll(currentState.getChildren(heuristicNum));
             if(!this.states.isEmpty()){
             int min= this.states.get(0).GH_sum();
@@ -32,7 +32,7 @@ public class SpaceSearcher {
             //Minimum Cost Found
             
         }
-           // Collections.sort(this.states);
+            //Collections.sort(this.states);
         }
         return null;
     }
@@ -50,7 +50,7 @@ public class SpaceSearcher {
                 this.closedSet.add(currentState);
                 this.states.addAll(currentState.getChildren(heuristicNum));
             }
-           // Collections.sort(this.states);
+           //Collections.sort(this.states);
         }
         return null;
     }

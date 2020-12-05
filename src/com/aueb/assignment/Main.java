@@ -3,7 +3,9 @@ package com.aueb.assignment;
 public class Main {
     public static void main(String[] args) {
 
-        State initialState = new State(4);
+        int [] leftSide = new int[]{1, 1, 1, 0};
+        int [] rightSide = new int[]{0, 0, 0, 1};
+        State initialState = new State(4, leftSide, rightSide);
         initialState.print();
         System.out.println("End of Initial State Printing");
         SpaceSearcher spaceSearcher = new SpaceSearcher();
