@@ -19,6 +19,10 @@ public class SpaceSearcher {
         this.states.add(initialState);
         while(this.states.size() > 0) {
             State currentState = this.states.remove(0);
+            try{
+             Thread.sleep(3000);
+            }catch(InterruptedException e){System.out.println(e);}  
+
             currentState.print();
             if(currentState.isTerminal()) {
                 return currentState;

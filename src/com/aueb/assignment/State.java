@@ -1,5 +1,6 @@
 package com.aueb.assignment;
-
+import java.util.Collections;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -27,11 +28,10 @@ public class State {
         this.memberSpeeds = new int[this.membersNum];
         this.rightSide = new int[this.membersNum];
         this.leftSide = new int[this.membersNum];
-        /*for(int i = 0; i < membersNum; i++){
-            this.rightSide[i] = i + 1;
-        }*/
-        Arrays.fill(this.rightSide, 1);
-        Arrays.fill(this.leftSide, 0);
+        for(int i = 0; i < membersNum; i++){
+            this.rightSide[i] = rightSide[i];
+            this.leftSide[i] = leftSide[i];
+        }
     }
 
     /***
@@ -88,8 +88,6 @@ public class State {
 
     /***Methods to move family members across the river*/
     public boolean moveLeft(int firstMember, int secondMember) {
-        if(firstMember < 0) {return false;}
-        if(secondMember < 0) {return false;}
         leftSide[firstMember] = 1;
         leftSide[secondMember] = 1;
         rightSide[firstMember] = 0;
@@ -99,7 +97,6 @@ public class State {
     }
 
     public boolean moveRight(int memberIndex) {
-        if(memberIndex<0) {return false;}
         leftSide[memberIndex] = 0;
         rightSide[memberIndex] = 1;
         isTorchLeft = false;
@@ -119,14 +116,19 @@ public class State {
 
         //If torch is on the right side we move 2 people left
         if(!isTorchLeft) {
+            indexes.clear();
 
-            list.clear();
-            while (!rightSide.indexOf)
-            while (!list.isEmpty()) {
-                int currentPerson = list.remove(0);
-                for (int element : list) {
+           for (int i = 0; i < rightSide.length; i++) {
+              if(rightSide[i]==1){
+                indexes.add(i);
+              }
+           }
+
+            while (!indexes.isEmpty()) {
+                int currentPerson = indexes.remove(0);
+                for (int element : indexes) {
                     child = new State(leftSide, rightSide, isTorchLeft,0);
-                    if (child.moveLeft(currentPerson, element-1)) {
+                    if (child.moveLeft(currentPerson, element)) {
                         this.hScore = heuristic.dimar_calculate(child);
                         child.setFather(this);
                         children.add(child);
@@ -135,7 +137,13 @@ public class State {
             }
         //If torch is on the left side we move 1 person right
         }else {
-            for (int elem : leftSide) {
+            indexes.clear();
+           for (int i = 0; i < leftSide.length; i++) {
+              if(leftSide[i]==1){
+                indexes.add(i);
+              }
+           }
+            for (int elem : indexes) {
                 child = new State(leftSide, rightSide, isTorchLeft,0);
                 if (child.moveRight(elem)) {
                     child.hScore = heuristic.dimar_calculate(child);
