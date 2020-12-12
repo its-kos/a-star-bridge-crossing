@@ -9,6 +9,7 @@ public class State {
     private int membersNum;
     private int hScore;
     private int gCost;
+    private int depth;
     private State father = null;
     private int [] memberSpeeds;
     private int [] leftSide;
@@ -22,29 +23,31 @@ public class State {
      * For initialization of the problem
      * @param membersNum : The number of the family members
      */
-    public State(int membersNum, int[]leftSide, int[]rightSide) {
+    public State(int membersNum, int[] leftSide, int[] rightSide, int[] speeds) {
         this.membersNum = membersNum;
         this.isTorchLeft = false;
-        this.memberSpeeds = new int[this.membersNum];
-        this.rightSide = new int[this.membersNum];
-        this.leftSide = new int[this.membersNum];
+        this.depth = 0;
+        this.memberSpeeds = new int[membersNum];
+        this.rightSide = new int[membersNum];
+        this.leftSide = new int[membersNum];
         for(int i = 0; i < membersNum; i++){
             this.rightSide[i] = rightSide[i];
             this.leftSide[i] = leftSide[i];
+            this.memberSpeeds[i] = speeds[i];
         }
     }
 
     /***
      * For copying states (Used in the getChildren method to make state copies).
      */
-    public State(int[]leftSide, int[]rightSide, boolean isTorchLeft, int gCost) {
-        this.membersNum = leftSide.length;
+    public State(int[]leftSide, int[]rightSide, boolean isTorchLeft, int gCost, int depth) {
+        this.membersNum = rightSide.length;
         this.isTorchLeft = isTorchLeft;
         this.gCost = gCost;
-        this.hScore = -1;
-        this.rightSide = new int[leftSide.length];
-        this.leftSide = new int[leftSide.length];
-        for(int i = 0; i < leftSide.length; i++){
+        this.depth = depth + 1;
+        this.rightSide = new int[membersNum];
+        this.leftSide = new int[membersNum];
+        for(int i = 0; i < membersNum; i++){
             this.rightSide[i] = rightSide[i];
             this.leftSide[i] = leftSide[i];
         }
@@ -58,7 +61,8 @@ public class State {
     public int getH() { return hScore; }
 
     public int getG() { return gCost; }
-    public int GH_sum() { return gCost+hScore; }
+
+    public int GH_sum() { return gCost + hScore; }
 
     public State getFather(){ return father; }
 
@@ -88,6 +92,7 @@ public class State {
 
     /***Methods to move family members across the river*/
     public boolean moveLeft(int firstMember, int secondMember) {
+        System.out.println("Moving member #" + firstMember + " and member #" + secondMember + " left");
         leftSide[firstMember] = 1;
         leftSide[secondMember] = 1;
         rightSide[firstMember] = 0;
@@ -97,12 +102,23 @@ public class State {
     }
 
     public boolean moveRight(int memberIndex) {
+        System.out.println("Moving member #" + memberIndex + " right");
         leftSide[memberIndex] = 0;
         rightSide[memberIndex] = 1;
         isTorchLeft = false;
         return true;
     }
 
+    //Calculates how many people are at the side provided
+    public int peopleSide(int[] side){
+        int count = 0;
+        for (int i = 0; i < side.length; i++) {
+            if(side[i] == 1){
+                count++;
+            }
+        }
+        return count;
+    }
     /***
      * Generates the children-states of the this state
      * Each child-state is created by moving 2 family members over to the left side or
@@ -112,24 +128,25 @@ public class State {
         ArrayList<State> children = new ArrayList<State>();
         ArrayList<Integer> indexes = new ArrayList<>();
         heuristic = new Heuristic(heuristicNum);
-        State child;
 
         //If torch is on the right side we move 2 people left
         if(!isTorchLeft) {
             indexes.clear();
 
-           for (int i = 0; i < rightSide.length; i++) {
-              if(rightSide[i]==1){
-                indexes.add(i);
+            //Find the indexes of all the people still on the right side
+            for (int i = 0; i < membersNum; i++) {
+              if(rightSide[i] == 1){
+                  indexes.add(i);
               }
            }
 
+            //Create one child for every combination of people that can cross
             while (!indexes.isEmpty()) {
                 int currentPerson = indexes.remove(0);
                 for (int element : indexes) {
-                    child = new State(leftSide, rightSide, isTorchLeft,0);
+                    State child = new State(leftSide, rightSide, isTorchLeft,0, this.depth);
                     if (child.moveLeft(currentPerson, element)) {
-                        this.hScore = heuristic.dimar_calculate(child);
+                        this.hScore = heuristic.calculate(child);
                         child.setFather(this);
                         children.add(child);
                     }
@@ -138,15 +155,15 @@ public class State {
         //If torch is on the left side we move 1 person right
         }else {
             indexes.clear();
-           for (int i = 0; i < leftSide.length; i++) {
-              if(leftSide[i]==1){
+           for (int i = 0; i < membersNum; i++) {
+              if(leftSide[i] == 1){
                 indexes.add(i);
               }
            }
             for (int elem : indexes) {
-                child = new State(leftSide, rightSide, isTorchLeft,0);
+                State child = new State(leftSide, rightSide, isTorchLeft, 0, this.depth);
                 if (child.moveRight(elem)) {
-                    child.hScore = heuristic.dimar_calculate(child);
+                    child.hScore = heuristic.calculate(child);
                     child.setFather(this);
                     children.add(child);
                 }

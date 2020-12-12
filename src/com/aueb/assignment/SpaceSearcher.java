@@ -5,56 +5,29 @@ import java.util.HashSet;
 
 public class SpaceSearcher {
 
-    private ArrayList<State> states;
+    private ArrayList<State> searchFront;
     private HashSet<State> closedSet;
 
     SpaceSearcher() {
-        this.states = null;
+        this.searchFront = null;
         this.closedSet = null;
     }
 
     public State aStar(State initialState, int heuristicNum) {
         System.out.println("A* Start");
-        this.states = new ArrayList<>();
-        this.states.add(initialState);
-        while(this.states.size() > 0) {
-            State currentState = this.states.remove(0);
-            try{
-             Thread.sleep(3000);
-            }catch(InterruptedException e){System.out.println(e);}  
-
+        this.searchFront = new ArrayList<>();
+        this.searchFront.add(initialState);
+        while(!(this.searchFront.size() == 0)) {
+            State currentState = this.searchFront.remove(0);
             currentState.print();
-            if(currentState.isTerminal()) {
-                return currentState;
+            if(currentState.isTerminal()) { return currentState; }
+            this.searchFront.addAll(currentState.getChildren(heuristicNum));
+            if(!this.searchFront.isEmpty()) {
+                int min = this.searchFront.get(0).GH_sum();
+                for (State state : this.searchFront) {
+                    if (state.GH_sum() < min) min = state.GH_sum();
+                }
             }
-            this.states.addAll(currentState.getChildren(heuristicNum));
-            if(!this.states.isEmpty()){
-            int min= this.states.get(0).GH_sum();
-            for(State state: this.states){
-                if(state.GH_sum()<min){ min=state.GH_sum(); }
-            }
-            //Minimum Cost Found
-            
-        }
-            //Collections.sort(this.states);
-        }
-        return null;
-    }
-
-    public State aStarClosedSet(State initialState, int heuristicNum) {
-        this.states = new ArrayList<State>();
-        this.closedSet = new HashSet<State>();
-        this.states.add(initialState);
-        while(this.states.size() > 0) {
-            State currentState = this.states.remove(0);
-            if(currentState.isTerminal()) {
-                return currentState;
-            }
-            if(!closedSet.contains(currentState)) {
-                this.closedSet.add(currentState);
-                this.states.addAll(currentState.getChildren(heuristicNum));
-            }
-           //Collections.sort(this.states);
         }
         return null;
     }
