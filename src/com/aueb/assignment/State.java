@@ -1,17 +1,13 @@
 package com.aueb.assignment;
-import java.util.Collections;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class State {
-    
     private int membersNum;
     private int hScore;
     private int gCost;
     private int depth;
     private State father = null;
-    private int [] memberSpeeds;
+    public int [] speeds= new int[]{11,22,32,43,5};
     private int [] leftSide;
     private int [] rightSide;
     private boolean isTorchLeft= false; //False if the torch is on the right side, true if its on the left side.
@@ -19,37 +15,37 @@ public class State {
 
     public State() {}
 
-    /***
-     * For initialization of the problem
-     * @param membersNum : The number of the family members
-     */
+   
     public State(int membersNum, int[] leftSide, int[] rightSide, int[] speeds) {
         this.membersNum = membersNum;
         this.isTorchLeft = false;
         this.depth = 0;
-        this.memberSpeeds = new int[membersNum];
         this.rightSide = new int[membersNum];
         this.leftSide = new int[membersNum];
+        this.speeds= new int[membersNum];
         for(int i = 0; i < membersNum; i++){
             this.rightSide[i] = rightSide[i];
             this.leftSide[i] = leftSide[i];
-            this.memberSpeeds[i] = speeds[i];
+            this.speeds[i] = speeds[i];
         }
     }
+    
 
     /***
      * For copying states (Used in the getChildren method to make state copies).
      */
-    public State(int[]leftSide, int[]rightSide, boolean isTorchLeft, int gCost, int depth) {
+    public State(int[]leftSide, int[]rightSide, boolean isTorchLeft, int gCost, int depth,int[] speeds) {
         this.membersNum = rightSide.length;
         this.isTorchLeft = isTorchLeft;
         this.gCost = gCost;
         this.depth = depth + 1;
         this.rightSide = new int[membersNum];
         this.leftSide = new int[membersNum];
+        this.speeds= new int[membersNum];
         for(int i = 0; i < membersNum; i++){
             this.rightSide[i] = rightSide[i];
             this.leftSide[i] = leftSide[i];
+            this.speeds[i] = speeds[i];
         }
     }
 
@@ -70,7 +66,7 @@ public class State {
 
     public int[] getRightSide() { return rightSide; }
 
-    public int[] getMemberSpeeds() { return memberSpeeds; }
+    public int[] getMemberSpeeds() { return speeds; }
 
     public boolean getisTorchLeft(){ return isTorchLeft; }
 
@@ -86,7 +82,7 @@ public class State {
 
     public void setRightSide(int[] rightSide) { this.rightSide = rightSide; }
 
-    public void setMemberSpeeds(int[] memberSpeeds) { this.memberSpeeds = memberSpeeds; }
+    //public void setMemberSpeeds(int[] memberSpeeds) { this.speeds = memberSpeeds; }
 
     public void setisTorchLeft(boolean state){ isTorchLeft = state; }
 
@@ -108,7 +104,9 @@ public class State {
         isTorchLeft = false;
         return true;
     }
-
+    public int findSlowestPerson(int firstMember,int secondMember){
+        return speeds[firstMember]>speeds[secondMember] ? secondMember :firstMember;
+    }
     //Calculates how many people are at the side provided
     public int peopleSide(int[] side){
         int count = 0;
@@ -144,7 +142,7 @@ public class State {
             while (!indexes.isEmpty()) {
                 int currentPerson = indexes.remove(0);
                 for (int element : indexes) {
-                    State child = new State(leftSide, rightSide, isTorchLeft,0, this.depth);
+                    State child = new State(leftSide, rightSide, isTorchLeft,0, this.depth,speeds);
                     if (child.moveLeft(currentPerson, element)) {
                         this.hScore = heuristic.calculate(child);
                         child.setFather(this);
@@ -161,7 +159,7 @@ public class State {
               }
            }
             for (int elem : indexes) {
-                State child = new State(leftSide, rightSide, isTorchLeft, 0, this.depth);
+                State child = new State(leftSide, rightSide, isTorchLeft, 0, this.depth,speeds);
                 if (child.moveRight(elem)) {
                     child.hScore = heuristic.calculate(child);
                     child.setFather(this);

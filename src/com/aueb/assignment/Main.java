@@ -3,9 +3,9 @@ package com.aueb.assignment;
 public class Main {
     public static void main(String[] args) {
 
-        int [] leftSide = new int[]{0, 0, 0, 0, 0};
+        int [] leftSide = new int[]{1, 0, 0, 0, 0};
         int [] speeds = new int[]{1, 3, 6, 8, 12};
-        int [] rightSide = new int[]{1, 1, 1, 1, 1};
+        int [] rightSide = new int[]{0, 1, 1, 1, 1};
         State initialState = new State(speeds.length, leftSide, rightSide, speeds);
         initialState.print();
         System.out.println("End of Initial State Printing");
